@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Review Analyzer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="pill">Feedback Review Analyzer</div>
+        <h1>Student Feedback Authenticity Review</h1>
+        <p>Analyze long feedback, screenshots, and Google Form exports with preprocessing, segmentation, word evidence, score bands, and star ratings.</p>
+      </div>
+      <div class="header-tools">
+        <label for="languageSelect">Language</label>
+        <select id="languageSelect">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="mr">मराठी</option>
+        </select>
+        <div class="health" id="healthStatus">Checking backend...</div>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="panel controls">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="manual" type="button">Text</button>
+          <button class="tab" data-tab="screenshot" type="button">Screenshot</button>
+          <button class="tab" data-tab="forms" type="button">Google Form</button>
+        </div>
+
+        <section class="tab-panel active" id="manualPanel">
+          <label for="feedbackText">Feedback Review Text</label>
+          <textarea id="feedbackText" placeholder="Paste 100-200 lines of feedback here..."></textarea>
+          <div class="meta-row">
+            <span id="charCounter">0 characters</span>
+            <span id="wordCounter">0 words</span>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="screenshotPanel">
+          <label for="screenshotInput">Screenshot or Snipping Area</label>
+          <input id="screenshotInput" type="file" accept="image/*" hidden />
+          <div class="drop-zone" id="dropZone" tabindex="0">
+            <strong>Upload, drop, or paste a screenshot</strong>
+            <span>After uploading, drag on the image to select the exact review area.</span>
+            <small id="screenshotName">No screenshot selected</small>
+          </div>
+          <div class="cropper" id="cropper" hidden>
+            <canvas id="imageCanvas"></canvas>
+            <div id="selectionBox" class="selection-box" hidden></div>
+          </div>
+          <div class="button-row">
+            <button class="secondary" id="extractFullBtn" type="button" disabled>OCR Full Image</button>
+            <button class="secondary" id="extractCropBtn" type="button" disabled>OCR Selected Area</button>
+          </div>
+          <div class="status" id="ocrStatus" hidden></div>
+        </section>
+
+        <section class="tab-panel" id="formsPanel">
+          <label for="formInput">Google Form CSV/TSV Export</label>
+          <input id="formInput" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" />
+          <label class="paste-label" for="formPaste">Or Paste Google Form / Sheets Data</label>
+          <textarea id="formPaste" class="form-paste" placeholder="Copy rows from Google Sheets, including the header row, then paste here..."></textarea>
+          <button class="secondary full-width" id="preprocessPasteBtn" type="button">Preprocess Pasted Data</button>
+          <div class="preprocess-summary" id="preprocessSummary">
+            Upload a form export or paste copied table data to remove personal fields and keep only feedback/review responses.
+          </div>
+          <div class="preprocess-table-wrap" id="preprocessWrap" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Extracted Review</th>
+                </tr>
+              </thead>
+              <tbody id="preprocessRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <button class="primary" id="analyzeBtn" type="button">
+          <span>Analyze Feedback</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </aside>
+
+      <section class="panel results" id="resultsPanel">
+        <div class="empty-state" id="emptyState">
+          <h2>Ready for analysis</h2>
+          <p>Add feedback text, OCR a selected screenshot area, or upload Google Form data. The result will show percentage, technical segmentation, star band, and repeated word evidence.</p>
+        </div>
+
+        <div class="results-content" id="resultsContent" hidden>
+          <div class="score-grid">
+            <div class="score-card">
+              <div class="score-head">
+                <div>
+                  <p>Final Classification</p>
+                  <h2 id="bandLabel">Genuine Review</h2>
+                </div>
+                <div class="stars" id="starRating">★★★★★</div>
+              </div>
+              <div class="score-ring" id="scoreRing" style="--score: 0">
+                <strong id="scoreValue">0%</strong>
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <h3>Technical Explanation</h3>
+              <div class="engine-pill" id="engineInfo">Analysis Engine: Waiting</div>
+              <p id="technicalSummary"></p>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h3>Segmented Analysis</h3>
+            <ul class="segment-list" id="segmentList"></ul>
+          </div>
+
+          <div class="section-card">
+            <h3>Word Evidence and Counts</h3>
+            <div class="keyword-grid" id="keywordGrid"></div>
+          </div>
+
+          <div class="section-card deduction-card">
+            <h3>Why This Review Is Not 100%</h3>
+            <ul id="deductionList"></ul>
+          </div>
+
+          <div class="two-col">
+            <div class="section-card">
+              <h3>Repeated Evidence</h3>
+              <ul id="evidenceList"></ul>
+            </div>
+            <div class="section-card">
+              <h3>Recommendations</h3>
+              <ul id="recommendationList"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
